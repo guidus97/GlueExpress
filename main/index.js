@@ -1,10 +1,24 @@
-var router = require('../controllers/mainRouter')
-var express = require('express')
-var app = express()
+const router = require('../factories/factoryRouter')
+const router1 = require('../factories/factoryRouter')
+const tokenRouter = require('../factories/factoryRouter')
+const express = require('express')
+const app = express()
+const port = process.env.port || 3000
+const session = require('../factories/factorySession')
 
-app.use('/', router)
+app.use(session({
+    secret: 'boh',
+    resave: false,
+    saveUninitialized: true
+}))
 
-app.listen(3100, () => {
-    console.log('Listen on 3100 port');
-    
+app.use(router)
+router.use('/token', router1)
+router1.use('/getToken', tokenRouter)
+
+const TokenRouter = require('../controllers/tokenRouter')
+const tc = new TokenRouter(tokenRouter)
+
+app.listen(port, () => {
+    console.log('Listen on port ' + port);
 })
